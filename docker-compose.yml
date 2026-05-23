@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: sports_scheduler_db
+    environment:
+      POSTGRES_USER: sports_user
+      POSTGRES_PASSWORD: sports_password
+      POSTGRES_DB: sports_scheduler
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sports_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./packages/backend
+      dockerfile: Dockerfile
+    container_name: sports_scheduler_backend
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://sports_user:sports_password@postgres:5432/sports_scheduler
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./packages/backend/src:/app/src
+    command: npm run dev
+
+  frontend:
+    build:
+      context: ./packages/frontend
+      dockerfile: Dockerfile
+    container_name: sports_scheduler_frontend
+    environment:
+      REACT_APP_API_URL: http://localhost:5000/api
+      REACT_APP_STRIPE_PUBLIC_KEY: ${REACT_APP_STRIPE_PUBLIC_KEY}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./packages/frontend/src:/app/src
+    command: npm run dev
+
+volumes:
+  postgres_data:

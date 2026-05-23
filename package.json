@@ -1,0 +1,15 @@
+{
+  "name": "sports-scheduler",
+  "version": "1.0.0",
+  "description": "Sports Scheduler Application",
+  "private": true,
+  "workspaces": [
+    "packages/backend",
+    "packages/frontend"
+  ],
+  "scripts": {
+    "dev": "yarn workspace @sports-scheduler/backend dev & yarn workspace @sports-scheduler/frontend dev",
+    "build": "yarn workspace @sports-scheduler/backend build && yarn workspace @sports-scheduler/frontend build",
+    "start": "yarn workspace @sports-scheduler/backend start"
+  }
+}
