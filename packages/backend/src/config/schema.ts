@@ -1,5 +1,7 @@
 import pool from './database';
 
+import { seedDatabase } from '../scripts/seed';
+
 export async function initializeDatabase() {
   const client = await pool.connect();
   try {
@@ -143,6 +145,7 @@ export async function initializeDatabase() {
 
     await client.query('COMMIT');
     console.log('Database initialized successfully');
+    // seedDatabase(client).catch(console.error);
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Database initialization error:', error);

@@ -52,7 +52,7 @@ services:
       - backend
     volumes:
       - ./packages/frontend/src:/app/src
-    command: npm run dev
+    command: yarn run dev
 
 volumes:
   postgres_data:
